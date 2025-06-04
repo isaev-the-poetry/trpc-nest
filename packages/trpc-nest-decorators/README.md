@@ -1,26 +1,25 @@
 # tRPC NestJS Decorators
 
-Пакет для интеграции tRPC с NestJS через декораторы с автоматической генерацией HTTP endpoints.
+A powerful package that brings tRPC integration to NestJS with decorators and automatic HTTP endpoints.
 
-## ✨ Возможности
+## Features
 
-- 🚀 **Автоматические HTTP endpoints** - генерируются из декораторов без дополнительной настройки
-- 🔄 **Поддержка tRPC HTTP Batch Link** - совместимость с официальным клиентом tRPC
-- 📊 **Короткие декораторы**: `@Router`, `@Query`, `@Mutation`, `@Subscription`
-- 🛡️ **Валидация данных** с помощью Zod схем
-- 🔗 **Полная интеграция с NestJS DI** - работает с существующими сервисами
-- ⚡ **Высокая производительность** - минимальные накладные расходы
-- 🎯 **TypeScript поддержка** - полная типизация из коробки
+- 🎯 **Decorator-based tRPC procedures** - Use familiar NestJS-style decorators
+- 🚀 **Automatic HTTP endpoints** - No need to manually set up HTTP routes
+- 🔍 **Auto-discovery** - Automatically discover and register tRPC controllers
+- 📝 **Type-safe** - Full TypeScript support with input/output validation
+- 🔧 **Easy integration** - Works seamlessly with existing NestJS applications
+- 📊 **Built-in monitoring** - Automatic endpoint documentation and schema generation
 
-## 📦 Установка
+## Installation
 
 ```bash
 npm install trpc-nest-decorators @trpc/server zod
 ```
 
-## 🚀 Быстрый старт
+## Quick Start
 
-### 1. Настройка модуля
+### 1. Set up the module
 
 ```typescript
 // app.module.ts
@@ -30,14 +29,15 @@ import { TrpcNestModule } from 'trpc-nest-decorators';
 @Module({
   imports: [
     TrpcNestModule.forRoot({
-      enableHttpEndpoints: true, // Включает автоматические HTTP endpoints
+      autoDiscovery: true, // Enable automatic controller discovery
+      enableHttpEndpoints: true, // Enable HTTP endpoints (default: true)
     }),
   ],
 })
 export class AppModule {}
 ```
 
-### 2. Создание контроллера с tRPC декораторами
+### 2. Create a tRPC controller
 
 ```typescript
 // users.controller.ts
@@ -45,52 +45,67 @@ import { Injectable } from '@nestjs/common';
 import { Router, Query, Mutation } from 'trpc-nest-decorators';
 import { z } from 'zod';
 
-const CreateUserSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  age: z.number().min(0)
-});
-
 @Router({ prefix: 'users' })
 @Injectable()
 export class UsersController {
-  private users = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', age: 30 }
-  ];
-
   @Query('getAll')
   async getAllUsers() {
-    return this.users;
+    return [
+      { id: 1, name: 'John Doe', email: 'john@example.com' },
+      { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
+    ];
   }
 
   @Query('getById', {
     input: z.object({ id: z.number() })
   })
   async getUserById(input: { id: number }) {
-    return this.users.find(user => user.id === input.id);
+    return { id: input.id, name: 'User', email: 'user@example.com' };
   }
 
   @Mutation('create', {
-    input: CreateUserSchema
+    input: z.object({
+      name: z.string(),
+      email: z.string().email(),
+    })
   })
-  async createUser(input: z.infer<typeof CreateUserSchema>) {
-    const newUser = {
-      id: Date.now(),
-      ...input
-    };
-    this.users.push(newUser);
-    return newUser;
+  async createUser(input: { name: string; email: string }) {
+    return { id: 3, ...input };
   }
 }
 ```
 
-### 3. Регистрация контроллера
+### 3. Register the controller in a module
+
+```typescript
+// users.module.ts
+import { Module } from '@nestjs/common';
+import { UsersController } from './users.controller';
+
+@Module({
+  providers: [UsersController],
+})
+export class UsersModule {}
+```
+
+## Auto-Discovery
+
+The package now supports automatic discovery of tRPC controllers. When `autoDiscovery: true` is set in the module options, the package will automatically:
+
+1. **Scan for controllers** - Find all classes decorated with `@Router`
+2. **Register procedures** - Automatically register all `@Query`, `@Mutation`, and `@Subscription` methods
+3. **Generate routes** - Create HTTP endpoints for all procedures
+4. **Build main router** - Combine all controllers into a single tRPC router
+
+### Manual Registration (Alternative)
+
+If you prefer manual control, you can disable auto-discovery and register controllers manually:
 
 ```typescript
 // app.service.ts
 import { Injectable } from '@nestjs/common';
 import { AutoRouterService } from 'trpc-nest-decorators';
-import { UsersController } from './users.controller';
+import { UsersController } from './users/users.controller';
 
 @Injectable()
 export class AppService {
@@ -98,79 +113,139 @@ export class AppService {
     private readonly autoRouterService: AutoRouterService,
     private readonly usersController: UsersController
   ) {
-    // Автоматическая регистрация контроллера
+    // Manual registration
     this.autoRouterService.registerController(UsersController, this.usersController);
   }
 }
 ```
 
-## 🌐 Автоматические HTTP Endpoints
+## Available Endpoints
 
-После настройки автоматически доступны следующие endpoints:
+When HTTP endpoints are enabled, the following routes are automatically created:
 
-### Информационный endpoint
+- `GET /api/trpc` - Application info and registered controllers
+- `GET /api/trpc-schema` - tRPC schema information
+- `POST /api/trpc/:procedure` - Single procedure call
+- `GET /api/trpc/:procedure` - GET procedure call (for queries with URL parameters)
+- `POST /api/trpc` - Batch procedure calls
+
+### Example API calls:
+
 ```bash
-GET /trpc
-# Возвращает информацию о доступных процедурах и примеры использования
+# Get all users
+curl "http://localhost:3000/api/trpc/users.getAll"
+
+# Get user by ID
+curl "http://localhost:3000/api/trpc/users.getById?input={\"id\":1}"
+
+# Create user (POST)
+curl -X POST "http://localhost:3000/api/trpc/users.create" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"New User","email":"new@example.com"}'
 ```
 
-### Одиночные вызовы процедур
-```bash
-# POST запросы для всех операций
-POST /trpc/:procedure
-Content-Type: application/json
-Body: { "input": "data" }
+## Decorators
 
-# GET запросы для query операций
-GET /trpc/:procedure?input=encodedJSON
+### @Router(options?)
+
+Marks a class as a tRPC router.
+
+```typescript
+@Router({ prefix: 'users' })
+export class UsersController {}
 ```
 
-### Batch запросы (совместимо с tRPC HTTP Batch Link)
-```bash
-POST /trpc
-Content-Type: application/json
-Body: {
-  "0": { "procedure": "users.getAll", "input": {} },
-  "1": { "procedure": "users.getById", "input": { "id": 1 } }
+### @Query(path?, options?)
+
+Marks a method as a tRPC query procedure.
+
+```typescript
+@Query('getAll')
+async getAllUsers() {}
+
+@Query('getById', { input: z.object({ id: z.number() }) })
+async getUserById(input: { id: number }) {}
+```
+
+### @Mutation(path?, options?)
+
+Marks a method as a tRPC mutation procedure.
+
+```typescript
+@Mutation('create', { 
+  input: z.object({ name: z.string() }) 
+})
+async createUser(input: { name: string }) {}
+```
+
+### @Subscription(path?, options?)
+
+Marks a method as a tRPC subscription procedure.
+
+```typescript
+@Subscription('userUpdates')
+async userUpdates() {
+  // Return observable
 }
 ```
 
-## 📋 Примеры использования
+## Configuration
 
-### Одиночные запросы
+### TrpcNestModuleOptions
 
-```bash
-# Получить всех пользователей
-curl -X POST http://localhost:3000/trpc/users.getAll \
-  -H "Content-Type: application/json" \
-  -d "{}"
-
-# Получить пользователя по ID (POST)
-curl -X POST http://localhost:3000/trpc/users.getById \
-  -H "Content-Type: application/json" \
-  -d '{"id": 1}'
-
-# Получить пользователя по ID (GET)
-curl "http://localhost:3000/trpc/users.getById?input=%7B%22id%22%3A1%7D"
-
-# Создать пользователя
-curl -X POST http://localhost:3000/trpc/users.create \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Alice", "email": "alice@example.com", "age": 25}'
+```typescript
+interface TrpcNestModuleOptions {
+  autoDiscovery?: boolean;        // Enable auto-discovery (default: false)
+  enableHttpEndpoints?: boolean;  // Enable HTTP endpoints (default: true)
+  httpPrefix?: string;           // HTTP route prefix (default: 'api/trpc')
+  controllers?: Type<any>[];     // Manual controller list (when autoDiscovery is false)
+}
 ```
 
-### Batch запросы
+## Advanced Usage
 
-```bash
-# Множественные запросы в одном HTTP вызове
-curl -X POST http://localhost:3000/trpc \
-  -H "Content-Type: application/json" \
-  -d '{
-    "0": { "procedure": "users.getAll", "input": {} },
-    "1": { "procedure": "users.getById", "input": { "id": 1 } },
-    "2": { "procedure": "users.create", "input": { "name": "Bob", "email": "bob@example.com", "age": 30 } }
-  }'
+### Getting the tRPC Router
+
+```typescript
+import { createMainRouter } from 'trpc-nest-decorators';
+
+const router = createMainRouter();
 ```
+
+### Getting Registered Controllers Info
+
+```typescript
+import { getRegisteredControllers } from 'trpc-nest-decorators';
+
+const controllers = getRegisteredControllers();
+```
+
+## Migration from Manual Registration
+
+If you're upgrading from a version without auto-discovery:
+
+1. **Enable auto-discovery** in your module:
+   ```typescript
+   TrpcNestModule.forRoot({ autoDiscovery: true })
+   ```
+
+2. **Remove manual registration** calls:
+   ```typescript
+   // Remove these lines:
+   // this.autoRouterService.registerController(UsersController, this.usersController);
+   ```
+
+3. **Ensure controllers are providers** in their respective modules:
+   ```typescript
+   @Module({
+     providers: [UsersController], // Make sure this is present
+   })
+   export class UsersModule {}
+   ```
+
+## License
+
+MIT
 
 ## 🎯 Интеграция с tRPC клиентом
 

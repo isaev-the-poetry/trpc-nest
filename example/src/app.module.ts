@@ -7,8 +7,10 @@ import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
-    // Подключаем наш пакет
-    TrpcNestModule.forRoot(),
+    // Подключаем наш пакет с автообнаружением
+    TrpcNestModule.forRoot({
+      autoDiscovery: true,
+    }),
     
     // Подключаем модули с контроллерами
     UsersModule,

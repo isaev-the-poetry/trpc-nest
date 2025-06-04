@@ -10,10 +10,10 @@ export class AppService {
     private readonly usersController: UsersController,
     private readonly postsController: PostsController
   ) {
-    // Регистрация контроллеров пока обязательна вручную
+    // Регистрация контроллеров теперь происходит автоматически
     // В будущих версиях планируется автоматическое обнаружение
-    this.autoRouterService.registerController(UsersController, this.usersController);
-    this.autoRouterService.registerController(PostsController, this.postsController);
+    // this.autoRouterService.registerController(UsersController, this.usersController);
+    // this.autoRouterService.registerController(PostsController, this.postsController);
   }
 
   /**
@@ -34,7 +34,7 @@ export class AppService {
       version: '1.0.0',
       description: 'Example application using trpc-nest-decorators with automatic HTTP endpoints',
       message: 'tRPC HTTP endpoints are now automatically provided by the package',
-      note: 'Controller registration is currently manual, but automatic discovery is planned',
+      note: 'Controller registration is now automatic using auto-discovery',
       automaticEndpoints: {
         info: 'GET /api/trpc',
         single: 'POST /api/trpc/:procedure',

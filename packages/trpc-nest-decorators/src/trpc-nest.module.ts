@@ -1,5 +1,5 @@
 import { Module, DynamicModule, Type } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { Reflector, ModuleRef } from '@nestjs/core';
 import { TrpcRouterService } from './trpc-router.service';
 import { AutoRouterService } from './auto-router.service';
 import { TrpcHttpController } from './trpc-http.controller';
@@ -14,7 +14,7 @@ export interface TrpcNestModuleOptions {
 @Module({})
 export class TrpcNestModule {
   static forRoot(options: TrpcNestModuleOptions = {}): DynamicModule {
-    const { enableHttpEndpoints = true } = options;
+    const { enableHttpEndpoints = true, autoDiscovery = false } = options;
 
     return {
       module: TrpcNestModule,
@@ -23,6 +23,10 @@ export class TrpcNestModule {
         Reflector,
         TrpcRouterService,
         AutoRouterService,
+        {
+          provide: 'TRPC_MODULE_OPTIONS',
+          useValue: options,
+        },
         {
           provide: 'TrpcNestModuleOptions',
           useValue: options,
