@@ -1,17 +1,17 @@
 # 🚀 Demo Instructions: tRPC NestJS Decorators
 
-Этот файл содержит пошаговые инструкции для демонстрации всех возможностей пакета `trpc-nest-decorators`.
+This file contains step-by-step instructions for demonstrating all capabilities of the `trpc-nest-decorators` package.
 
-## 📋 Предварительные требования
+## 📋 Prerequisites
 
-- Node.js (версия 14 или выше)
-- npm или yarn
-- curl (для HTTP запросов)
-- python3 (для форматирования JSON, опционально)
+- Node.js (version 14 or higher)
+- npm or yarn
+- curl (for HTTP requests)
+- python3 (for JSON formatting, optional)
 
-## 🛠️ Настройка
+## 🛠️ Setup
 
-### 1. Установка и сборка основного пакета
+### 1. Install and build the main package
 
 ```bash
 cd ../packages/trpc-nest-decorators
@@ -19,195 +19,195 @@ npm install
 npm run build
 ```
 
-### 2. Установка зависимостей примера
+### 2. Install example dependencies
 
 ```bash
 cd ../example
 npm install
 ```
 
-### 3. Сборка примера
+### 3. Build the example
 
 ```bash
 npm run build
 ```
 
-### 4. Запуск сервера
+### 4. Start the server
 
 ```bash
 npm start
 ```
 
-Сервер запустится на http://localhost:3000
+The server will start at http://localhost:3000
 
-## 🎯 Демонстрационные сценарии
+## 🎯 Demo Scenarios
 
-### Сценарий 1: Быстрое тестирование базовой функциональности
+### Scenario 1: Quick testing of basic functionality
 
-**Время выполнения:** ~2 минуты
+**Execution time:** ~2 minutes
 
 ```bash
-# Запустите простой тест
+# Run a simple test
 ./test-current-api.sh
 ```
 
-**Что демонстрируется:**
-- ✅ Проверка работы сервера
-- ✅ Получение информации о зарегистрированных контроллерах
-- ✅ Схема автоматически сгенерированного tRPC роутера
-- ✅ Базовый пример вызова `posts.getAll`
+**What is demonstrated:**
+- ✅ Server functionality check
+- ✅ Getting information about registered controllers
+- ✅ Automatically generated tRPC router schema
+- ✅ Basic example of calling `posts.getAll`
 
-### Сценарий 2: Полная демонстрация всех возможностей
+### Scenario 2: Full demonstration of all capabilities
 
-**Время выполнения:** ~5 минут
+**Execution time:** ~5 minutes
 
 ```bash
-# Запустите полную демонстрацию
+# Run full demonstration
 ./trpc-demo-working.sh
 ```
 
-**Что демонстрируется:**
-- 📊 Query операции (getAll, getById, search)
-- 🔄 Mutation операции (create, update, delete)
-- 🛡️ Валидация входных данных
-- ❌ Обработка ошибок
-- 📈 Проверка изменений в реальном времени
-- ⚡ Тестирование производительности
+**What is demonstrated:**
+- 📊 Query operations (getAll, getById, search)
+- 🔄 Mutation operations (create, update, delete)
+- 🛡️ Input data validation
+- ❌ Error handling
+- 📈 Real-time change verification
+- ⚡ Performance testing
 
-### Сценарий 3: Концептуальные примеры для продакшена
+### Scenario 3: Conceptual examples for production
 
-**Время выполнения:** ~3 минуты
+**Execution time:** ~3 minutes
 
 ```bash
-# Посмотрите примеры для полной интеграции
+# View examples for full integration
 ./demo-trpc-calls.sh
 ```
 
-**Что демонстрируется:**
-- 🔮 Примеры с полным tRPC HTTP адаптером
-- 📡 GET запросы для query операций
-- 📤 POST запросы для mutations
-- 🔄 Batch запросы
+**What is demonstrated:**
+- 🔮 Examples with full tRPC HTTP adapter
+- 📡 GET requests for query operations
+- 📤 POST requests for mutations
+- 🔄 Batch requests
 - 🌐 WebSocket subscriptions
-- 📚 Инструкции по интеграции
+- 📚 Integration instructions
 
-## 🧪 Ручные тесты
+## 🧪 Manual Tests
 
-### Тест 1: Основные endpoints
+### Test 1: Basic endpoints
 
 ```bash
-# Информация о приложении
+# Application information
 curl http://localhost:3000/api
 
-### Тест 2: Query операции
+### Test 2: Query operations
 
 ```bash
-# Получить всех пользователей
+# Get all users
 curl -X POST http://localhost:3000/api/trpc/users.getAll \
   -H "Content-Type: application/json" \
   -d "{}"
 
-# Получить всех постов
+# Get all posts
 curl -X POST http://localhost:3000/api/trpc/posts.getAll \
   -H "Content-Type: application/json" \
   -d "{}"
 
-# Получить пользователя по ID
+# Get user by ID
 curl -X POST http://localhost:3000/api/trpc/users.getById \
   -H "Content-Type: application/json" \
   -d '{"id": 1}'
 
-# Поиск пользователей
+# Search users
 curl -X POST http://localhost:3000/api/trpc/users.search \
   -H "Content-Type: application/json" \
   -d '{"query": "john"}'
 ```
 
-### Тест 3: Mutation операции
+### Test 3: Mutation operations
 
 ```bash
-# Создать нового пользователя
+# Create a new user
 curl -X POST http://localhost:3000/api/trpc/users.create \
   -H "Content-Type: application/json" \
   -d '{"name": "Alice Johnson", "email": "alice@example.com", "age": 28}'
 
-# Создать новый пост
+# Create a new post
 curl -X POST http://localhost:3000/api/trpc/posts.create \
   -H "Content-Type: application/json" \
   -d '{"title": "Demo Post", "content": "This is a demo post!", "authorId": 1}'
 
-# Обновить пост
+# Update a post
 curl -X POST http://localhost:3000/api/trpc/posts.update \
   -H "Content-Type: application/json" \
   -d '{"id": 1, "title": "Updated Title", "content": "Updated content"}'
 ```
 
-### Тест 4: Обработка ошибок
+### Test 4: Error handling
 
 ```bash
-# Несуществующая процедура
+# Non-existent procedure
 curl -X POST http://localhost:3000/api/trpc/invalid.method \
   -H "Content-Type: application/json" \
   -d "{}"
 
-# Неверный формат процедуры
+# Invalid procedure format
 curl -X POST http://localhost:3000/api/trpc/invalidformat \
   -H "Content-Type: application/json" \
   -d "{}"
 
-# Несуществующий пользователь
+# Non-existent user
 curl -X POST http://localhost:3000/api/trpc/users.getById \
   -H "Content-Type: application/json" \
   -d '{"id": 999}'
 ```
 
-## 🎨 Демонстрация для презентации
+## 🎨 Presentation Demo
 
-### Слайд 1: Введение
+### Slide 1: Introduction
 ```bash
-# Покажите основную информацию
+# Show basic information
 curl http://localhost:3000/api | python3 -m json.tool
 ```
 
-### Слайд 2: Простота использования
+### Slide 2: Ease of use
 ```bash
-# Покажите как легко вызвать процедуру
+# Show how easy it is to call a procedure
 curl -X POST http://localhost:3000/api/trpc/posts.getAll \
   -H "Content-Type: application/json" \
   -d "{}" | python3 -m json.tool
 ```
 
-### Слайд 3: Валидация данных
+### Slide 3: Data validation
 ```bash
-# Покажите создание с валидацией
+# Show creation with validation
 curl -X POST http://localhost:3000/api/trpc/users.create \
   -H "Content-Type: application/json" \
   -d '{"name": "John", "email": "john@test.com", "age": 25}' | python3 -m json.tool
 ```
 
-### Слайд 4: Обработка ошибок
+### Slide 4: Error handling
 ```bash
-# Покажите graceful error handling
+# Show graceful error handling
 curl -X POST http://localhost:3000/api/trpc/users.getById \
   -H "Content-Type: application/json" \
   -d '{"id": 999}' | python3 -m json.tool
 ```
 
-## 📊 Анализ производительности
+## 📊 Performance Analysis
 
-### Время отклика одиночных запросов
+### Single request response time
 
 ```bash
-# Измерьте время отклика
+# Measure response time
 time curl -X POST http://localhost:3000/api/trpc/posts.getAll \
   -H "Content-Type: application/json" \
   -d "{}" > /dev/null 2>&1
 ```
 
-### Множественные запросы
+### Multiple requests
 
 ```bash
-# Тест множественных вызовов
+# Test multiple calls
 for i in {1..10}; do
   curl -X POST http://localhost:3000/api/trpc/users.getAll \
     -H "Content-Type: application/json" \
@@ -215,45 +215,45 @@ for i in {1..10}; do
 done
 ```
 
-### Нагрузочное тестирование (если установлен ab)
+### Load testing (if ab is installed)
 
 ```bash
-# Apache Bench тестирование (опционально)
+# Apache Bench testing (optional)
 ab -n 100 -c 10 -T 'application/json' -p data.json \
    http://localhost:3000/api/trpc/posts.getAll
 ```
 
-Где `data.json` содержит: `{}`
+Where `data.json` contains: `{}`
 
-## 🔧 Настройка для разных сценариев
+## 🔧 Configuration for Different Scenarios
 
-### Разработка
+### Development
 
 ```bash
-# Запуск в режиме разработки
+# Run in development mode
 npm run start:dev
 ```
 
-### Продакшн
+### Production
 
 ```bash
-# Сборка для продакшена
+# Build for production
 npm run build
 
-# Запуск продакшн версии
+# Run production version
 npm start
 ```
 
-### Дебаг
+### Debug
 
 ```bash
-# Запуск с расширенным логированием
+# Run with extended logging
 DEBUG=* npm start
 ```
 
-## 📝 Пример ответов
+## 📝 Response Examples
 
-### Успешный ответ
+### Successful response
 
 ```json
 {
@@ -273,7 +273,7 @@ DEBUG=* npm start
 }
 ```
 
-### Ответ с ошибкой
+### Error response
 
 ```json
 {
@@ -283,44 +283,44 @@ DEBUG=* npm start
 }
 ```
 
-## 🎯 Ключевые моменты для демонстрации
+## 🎯 Key Points for Demonstration
 
-1. **Простота интеграции**: Достаточно добавить декораторы к существующим контроллерам
-2. **Автоматическая генерация**: tRPC роутеры создаются автоматически
-3. **Типобезопасность**: Полная поддержка TypeScript
-4. **Валидация**: Интеграция с Zod из коробки
-5. **DI совместимость**: Работает с существующей DI системой NestJS
-6. **Гибкость**: Поддерживает query, mutation и subscription
-7. **Производительность**: Минимальные накладные расходы
+1. **Integration simplicity**: Just add decorators to existing controllers
+2. **Automatic generation**: tRPC routers are created automatically
+3. **Type safety**: Full TypeScript support
+4. **Validation**: Zod integration out of the box
+5. **DI compatibility**: Works with existing NestJS DI system
+6. **Flexibility**: Supports query, mutation, and subscription
+7. **Performance**: Minimal overhead
 
-## 🚨 Частые проблемы
+## 🚨 Common Issues
 
-### Сервер не запускается
+### Server won't start
 ```bash
-# Проверьте порт
+# Check port
 lsof -i :3000
 
-# Убийте процесс если нужно
+# Kill process if needed
 pkill -f "node.*nest"
 ```
 
-### Ошибки curl
+### curl errors
 ```bash
-# Убедитесь что сервер запущен
+# Make sure server is running
 curl http://localhost:3000/api
 
-# Проверьте формат JSON
+# Check JSON format
 echo '{"id": 1}' | python3 -m json.tool
 ```
 
-### Зависимости
+### Dependencies
 ```bash
-# Переустановите зависимости
+# Reinstall dependencies
 rm -rf node_modules package-lock.json
 npm install
 ```
 
-## 💡 Дополнительные ресурсы
+## 💡 Additional Resources
 
 - [tRPC Documentation](https://trpc.io)
 - [NestJS Documentation](https://nestjs.com)
@@ -329,4 +329,4 @@ npm install
 
 ---
 
-**Удачной демонстрации! 🎉** 
+**Happy demonstrating! 🎉** 
