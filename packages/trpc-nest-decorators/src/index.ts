@@ -1,5 +1,6 @@
 // Decorators
 export * from './decorators';
+export * from './trpc-app-router.decorator';
 
 // Types
 export * from './types';
@@ -7,8 +8,9 @@ export * from './types';
 // Services
 export * from './trpc-router.service';
 export * from './auto-router.service';
+export * from './trpc-router-provider.service';
 
-// Module
+// Module and injection tokens
 export * from './trpc-nest.module';
 
 // Convenience functions for auto router

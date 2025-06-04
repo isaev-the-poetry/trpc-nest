@@ -56,36 +56,30 @@ trpc-nest-decorators/
 - **Performance**: efficient router generation
 
 ## Quick Start
-
-### 1. Build Package
-
-```bash
-cd packages/trpc-nest-decorators
-npm install
-npm run build
-```
-
-### 2. Run Example
-
-```bash
-cd example
-npm install
-npm run build
-npm start
-```
-
-### 3. Testing
-
-Open your browser and navigate to:
-- http://localhost:3000/api - application information
-
-## Usage in Your Project
-
+   
 ### Installation
 
 ```bash
 npm install trpc-nest-decorators @trpc/server zod
 ```
+
+### Module Integration
+
+```typescript
+import { Module } from '@nestjs/common';
+import { TrpcNestModule } from 'trpc-nest-decorators';
+
+@Module({
+  imports: [TrpcNestModule.forRoot({
+     // Auto discovery - automatically find all controllers with @Router decorator
+      autoDiscovery: true,
+      // Optional: specify directories to scan
+      controllersPath: ['src/**/*.controller.ts'],
+  })],
+  // ... other settings
+})
+export class AppModule {}
+``` 
 
 ### Creating a Controller
 
@@ -110,40 +104,81 @@ export class UsersController {
   }
 }
 ```
+ 
 
-### Module Integration
-
-```typescript
-import { Module } from '@nestjs/common';
-import { TrpcNestModule } from 'trpc-nest-decorators';
-
-@Module({
-  imports: [TrpcNestModule.forRoot()],
-  // ... other settings
-})
-export class AppModule {}
-```
-
-### Automatic Router
-
+### Frontend Integration
+ 
+**Backend (app.service.ts) - Multiple ways to get the router:** 
+**Method 1: Using createMainRouter (as before):**
 ```typescript
 import { Injectable } from '@nestjs/common';
-import { createMainRouter, AutoRouterService } from 'trpc-nest-decorators';
+import { createMainRouter } from 'trpc-nest-decorators';
 
 @Injectable()
 export class AppService {
-  constructor(
-    private readonly autoRouterService: AutoRouterService,
-    private readonly usersController: UsersController
-  ) {
-    // Register controller
-    this.autoRouterService.registerController(UsersController, this.usersController);
-  }
-
   getTrpcRouter() {
-    // Get automatically created router
+    // Get automatically created router with auto discovery
+    // All controllers with @Router decorator will be included automatically
     return createMainRouter();
   }
+}
+
+// Export router type for frontend
+export type AppRouter = ReturnType<typeof AppService.prototype.getTrpcRouter>;
+```
+
+**Method 2: Using TrpcRouterProvider (recommended):**
+```typescript
+import { Injectable } from '@nestjs/common';
+import { InjectTrpcRouter, TrpcRouterProvider, AppRouter } from 'trpc-nest-decorators';
+
+@Injectable()
+export class AppService {
+  constructor(@InjectTrpcRouter() private trpcRouter: TrpcRouterProvider) {}
+  
+  @AppRouter()
+  getTrpcRouter() {} // decorator will handle method automaticly
+  
+  // OR implement explicit way  
+  // getTrpcRouter() {
+  //  return this.trpcRouter.getMainRouter();
+  // } 
+}
+```
+
+**Frontend (React/Next.js):**
+```typescript
+import { createTRPCReact } from '@trpc/react-query';
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
+import type { AppRouter } from '../backend/src/app.service';
+
+// For React with React Query
+export const trpc = createTRPCReact<AppRouter>();
+
+// For vanilla usage
+export const trpcClient = createTRPCProxyClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: 'http://localhost:3000/trpc',
+    }),
+  ],
+});
+
+// Usage in React component
+function UsersComponent() {
+  const { data: users } = trpc.users.getAll.useQuery();
+  const createUser = trpc.users.create.useMutation();
+
+  const handleCreate = () => {
+    createUser.mutate({ name: 'New User' });
+  };
+
+  return (
+    <div>
+      {users?.map(user => <div key={user.id}>{user.name}</div>)}
+      <button onClick={handleCreate}>Create User</button>
+    </div>
+  );
 }
 ```
 
@@ -173,6 +208,121 @@ Returns automatically created main tRPC router
 ### `getRegisteredControllers()`
 Returns information about registered controllers
 
+## 🆕 Built-in Main Router Access
+
+Now the package provides several ways to get the main tRPC router directly from the package itself, without needing to call `createMainRouter()` in client code.
+
+### Advantages of the built-in approach:
+- ✅ **Automation**: Router is created and updated automatically
+- ✅ **Dependency Injection**: Full integration with NestJS DI system  
+- ✅ **Type Safety**: TypeScript support out of the box
+- ✅ **Flexibility**: Multiple ways to get the router
+- ✅ **Performance**: Caching and instance reuse
+
+### Available methods:
+
+#### 1. TrpcRouterProvider (recommended)
+```typescript
+import { Injectable } from '@nestjs/common';
+import { InjectTrpcRouter, TrpcRouterProvider } from 'trpc-nest-decorators';
+
+@Injectable()
+export class ApiService {
+  constructor(@InjectTrpcRouter() private trpcRouter: TrpcRouterProvider) {}
+
+  getRouter() {
+    return this.trpcRouter.getMainRouter();
+  }
+
+  // Additional methods
+  getControllers() {
+    return this.trpcRouter.getRegisteredControllers();
+  }
+
+  refreshRouter() {
+    return this.trpcRouter.refreshMainRouter();
+  }
+}
+```
+
+#### 2. @AppRouter Decorator
+```typescript
+import { Injectable } from '@nestjs/common';
+import { InjectTrpcRouter, TrpcRouterProvider, AppRouter } from 'trpc-nest-decorators';
+
+@Injectable()
+export class ApiService {
+  constructor(@InjectTrpcRouter() private trpcRouter: TrpcRouterProvider) {}
+
+  @AppRouter()
+  getAppRouter() {
+    // The decorator will automatically return the main router
+    // No method code needed
+  }
+}
+```
+
+#### 3. Direct Token Injection
+```typescript
+import { Injectable, Inject } from '@nestjs/common';
+import { MAIN_TRPC_ROUTER } from 'trpc-nest-decorators';
+
+@Injectable()
+export class ApiService {
+  constructor(@Inject(MAIN_TRPC_ROUTER) private getRouter: () => any) {}
+
+  getAppRouter() {
+    return this.getRouter();
+  }
+}
+```
+
+#### 4. Traditional Way (still works)
+```typescript
+import { Injectable } from '@nestjs/common';
+import { createMainRouter } from 'trpc-nest-decorators';
+
+@Injectable()
+export class ApiService {
+  getAppRouter() {
+    return createMainRouter();
+  }
+}
+```
+
+### Migration from traditional approach
+
+**Before:**
+```typescript
+@Injectable()
+export class AppService {
+  getTrpcRouter() {
+    return createMainRouter();
+  }
+}
+```
+
+**Now (recommended approach):**
+```typescript
+@Injectable()
+export class AppService {
+  constructor(@InjectTrpcRouter() private trpcRouter: TrpcRouterProvider) {}
+
+  getTrpcRouter() {
+    return this.trpcRouter.getMainRouter();
+  }
+}
+```
+
+### Type Export for Frontend
+
+All methods are fully compatible with type export:
+
+```typescript
+// Any of the methods above
+export type AppRouter = ReturnType<typeof AppService.prototype.getTrpcRouter>;
+```
+
 ## Examples
 
 In the `example/` folder you'll find a complete working example with:
@@ -183,36 +333,8 @@ In the `example/` folder you'll find a complete working example with:
 - Full integration with NestJS DI
 
 ## Backward Compatibility
-
-Old decorators with `Trpc` prefix are still supported:
-
-```typescript
-// Old syntax (still works)
-import { TrpcRouter, TrpcQuery, TrpcMutation } from 'trpc-nest-decorators';
-
-// New syntax (recommended)
-import { Router, Query, Mutation } from 'trpc-nest-decorators';
-```
-
-## Development Plans
-
-- [x] Short decorators without prefix
-- [x] Automatic main router
-- [x] **tRPC v11 support**
-- [x] **FormData / Non-JSON Content Types**
-- [x] **Streaming Responses**
-- [x] **Server-Sent Events Subscriptions**
-- [x] **Enhanced subscriptions with generators**
-- [x] **Shorthand Router Definitions**
-- [ ] HTTP adapter integration
-- [ ] Middleware support
-- [ ] Authentication and authorization
-- [ ] Extended typing
-- [ ] API documentation
-- [ ] Tests
-- [ ] **TanStack Query v5 integration**
-- [ ] **React Server Components support**
-
+ 
+  
 ## License
 
 MIT

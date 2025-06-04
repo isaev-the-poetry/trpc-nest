@@ -1,6 +1,6 @@
 {
   "name": "trpc-nest-decorators",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Decorators to extend NestJS controllers with tRPC v11 functionality",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,6 +14,11 @@
     "prepublishOnly": "npm run build",
     "git push github": "ssh-add ~/.ssh/github; git push -u origin main"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/isaev-the-poetry/trpc-nest.git"
+  },
+  "homepage": "https://github.com/isaev-the-poetry/trpc-nest#readme",
   "keywords": [
     "nestjs",
     "trpc",
@@ -23,7 +28,7 @@
     "formdata",
     "streaming"
   ],
-  "author": "Your Name",
+  "author": "Igor Isaev",
   "license": "MIT",
   "peerDependencies": {
     "@nestjs/common": "^10.0.0",
