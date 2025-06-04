@@ -144,6 +144,9 @@ export class AppService {
   //  return this.trpcRouter.getMainRouter();
   // } 
 }
+
+// Export router type for frontend
+export type AppRouter = ReturnType<typeof AppService.prototype.getTrpcRouter>;
 ```
 
 **Frontend (React/Next.js):**
