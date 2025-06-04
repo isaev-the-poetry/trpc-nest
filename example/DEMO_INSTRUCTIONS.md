@@ -99,10 +99,6 @@ npm start
 # Информация о приложении
 curl http://localhost:3000/api
 
-# Схема tRPC роутера
-curl http://localhost:3000/api/trpc-schema
-```
-
 ### Тест 2: Query операции
 
 ```bash

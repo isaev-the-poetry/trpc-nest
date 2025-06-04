@@ -14,5 +14,8 @@ export * from './trpc-nest.module';
 // Convenience functions for auto router
 export { createMainRouter, getRegisteredControllers } from './main-router';
 
-// New TrpcHttpController
-export * from './trpc-http.controller'; 
+// HTTP Controller
+export * from './trpc-http.controller';
+
+// tRPC v11 utilities and helpers
+export * from './trpc-v11-utils'; 

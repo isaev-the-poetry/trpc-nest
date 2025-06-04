@@ -51,11 +51,6 @@ print_command "curl -s '$API_BASE' | jq ."
 echo "Getting application info with registered controllers:"
 curl -s "$API_BASE" | python3 -m json.tool 2>/dev/null || curl -s "$API_BASE"
 
-echo ""
-print_command "curl -s '$API_BASE/trpc-schema' | jq ."
-echo "Getting tRPC schema information:"
-curl -s "$API_BASE/trpc-schema" | python3 -m json.tool 2>/dev/null || curl -s "$API_BASE/trpc-schema"
-
 print_section "tRPC HTTP Adapter Examples (Future Implementation)"
 
 echo "When tRPC HTTP adapter is integrated, the calls would look like this:"

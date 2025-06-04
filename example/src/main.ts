@@ -14,8 +14,7 @@ async function bootstrap() {
   await app.listen(port);
   
   console.log(`🚀 Application is running on: http://localhost:${port}/api`);
-  console.log(`📊 Info endpoint: http://localhost:${port}/api`);
-  console.log(`🔧 tRPC schema: http://localhost:${port}/api/trpc-schema`);
+  console.log(`📊 Info endpoint: http://localhost:${port}/api`); 
 }
 
 bootstrap(); 

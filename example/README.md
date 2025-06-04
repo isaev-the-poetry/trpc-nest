@@ -63,7 +63,6 @@ npm run start:dev
 ### Информационные endpoints
 
 - `GET /api` - информация о приложении и зарегистрированных контроллерах
-- `GET /api/trpc-schema` - схема tRPC роутера
 
 ### tRPC HTTP endpoints
 

@@ -52,8 +52,6 @@ echo -e "${GREEN}✅ Server is running at $API_BASE${NC}"
 print_test "Application Info"
 run_curl "$API_BASE"
 
-print_test "tRPC Schema Information"
-run_curl "$API_BASE/trpc-schema"
 
 print_test "Demo tRPC Call (Placeholder)"
 echo -e "${YELLOW}$ curl -X POST '$API_BASE/trpc/posts.getAll' -H 'Content-Type: application/json'${NC}"

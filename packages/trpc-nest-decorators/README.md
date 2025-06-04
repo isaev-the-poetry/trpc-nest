@@ -124,7 +124,6 @@ export class AppService {
 When HTTP endpoints are enabled, the following routes are automatically created:
 
 - `GET /api/trpc` - Application info and registered controllers
-- `GET /api/trpc-schema` - tRPC schema information
 - `POST /api/trpc/:procedure` - Single procedure call
 - `GET /api/trpc/:procedure` - GET procedure call (for queries with URL parameters)
 - `GET /api/trpc/:procedures?batch=1` - **NEW**: GET batch calls  
