@@ -127,12 +127,13 @@ When HTTP endpoints are enabled, the following routes are automatically created:
 - `GET /api/trpc-schema` - tRPC schema information
 - `POST /api/trpc/:procedure` - Single procedure call
 - `GET /api/trpc/:procedure` - GET procedure call (for queries with URL parameters)
+- `GET /api/trpc/:procedures?batch=1` - **NEW**: GET batch calls  
 - `POST /api/trpc` - Batch procedure calls
 
 ### Example API calls:
 
 ```bash
-# Get all users
+# Get all users (single request)
 curl "http://localhost:3000/api/trpc/users.getAll"
 
 # Get user by ID
@@ -142,6 +143,48 @@ curl "http://localhost:3000/api/trpc/users.getById?input={\"id\":1}"
 curl -X POST "http://localhost:3000/api/trpc/users.create" \
   -H "Content-Type: application/json" \
   -d '{"name":"New User","email":"new@example.com"}'
+
+# GET Batch requests  
+curl "http://localhost:3000/api/trpc/users.getAll,posts.getAll?batch=1"
+
+# GET Batch with input parameters
+curl "http://localhost:3000/api/trpc/users.getById,posts.getById?batch=1&input=%7B%220%22%3A%7B%22json%22%3A%7B%22id%22%3A1%7D%7D%2C%221%22%3A%7B%22json%22%3A%7B%22id%22%3A2%7D%7D%7D"
+
+# POST Batch (original tRPC format)
+curl -X POST "http://localhost:3000/api/trpc" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "0": { "procedure": "users.getAll", "input": {} },
+    "1": { "procedure": "posts.getById", "input": { "id": 1 } }
+  }'
+```
+
+### GET Batch Format  
+
+The new GET batch format supports the same structure:
+
+```
+GET /api/trpc/procedure1,procedure2,procedure3?batch=1&input=encodedJSON
+```
+
+Where:
+- **procedures**: Comma-separated list of procedure names (e.g., `users.getAll,posts.getById`)
+- **batch=1**: Required parameter to enable batch mode
+- **input**: URL-encoded JSON with indexed input data:
+  ```json
+  {
+    "0": { "json": { "id": 126 } },
+    "1": { "json": { "id": 126 } },
+    "2": { "json": { "id": 1783 } }
+  }
+  ```
+
+Response format:
+```json
+{
+  "0": { "result": [...], "timestamp": "2025-06-04T18:12:56.320Z" },
+  "1": { "result": [...], "timestamp": "2025-06-04T18:12:56.320Z" }
+}
 ```
 
 ## Decorators

@@ -42,11 +42,95 @@ export class TrpcHttpController {
   }
 
   /**
-   * Обработка GET запросов для query операций
-   * GET /trpc/procedureName?input=encodedJSON
+   * Обработка GET batch запросов в формате: procedures,procedure2,procedure3?batch=1&input=...
+   * GET /trpc/procedure1,procedure2,procedure3?batch=1&input=batchInputJSON
    */
-  @Get(':procedure')
-  async handleGetProcedure(@Param('procedure') procedure: string, @Query('input') inputParam?: string) {
+  @Get(':procedures')
+  async handleGetBatchProcedures(
+    @Param('procedures') procedures: string,
+    @Query('batch') batch?: string,
+    @Query('input') inputParam?: string
+  ) {
+    // Проверяем, является ли это batch запросом
+    if (batch === '1' && procedures.includes(',')) {
+      this.logger.debug(`GET Batch tRPC call: ${procedures}`, { inputParam });
+      
+      try {
+        const procedureList = procedures.split(',').map(p => p.trim());
+        let batchInput: Record<string, any> = {};
+        
+        if (inputParam) {
+          try {
+            batchInput = JSON.parse(decodeURIComponent(inputParam));
+          } catch (parseError) {
+            throw new HttpException(
+              {
+                error: 'Invalid input parameter. Must be valid JSON.',
+                procedures: procedureList,
+                timestamp: new Date().toISOString()
+              },
+              HttpStatus.BAD_REQUEST
+            );
+          }
+        }
+
+        const batchResults: Record<string, any> = {};
+        const promises: Promise<void>[] = [];
+
+        // Обрабатываем каждую процедуру в batch запросе
+        procedureList.forEach((procedure, index) => {
+          const indexKey = index.toString();
+          const input = batchInput[indexKey]?.json || batchInput[indexKey] || {};
+          
+          promises.push(
+            this.executeProcedure(procedure, input)
+              .then(result => {
+                batchResults[indexKey] = {
+                  result,
+                  timestamp: new Date().toISOString()
+                };
+              })
+              .catch(error => {
+                batchResults[indexKey] = {
+                  error: {
+                    message: error.message || 'Operation failed',
+                    code: error.code || 'INTERNAL_ERROR'
+                  }
+                };
+              })
+          );
+        });
+
+        // Ждем выполнения всех операций
+        await Promise.all(promises);
+
+        return batchResults;
+      } catch (error: any) {
+        if (error instanceof HttpException) {
+          throw error;
+        }
+        
+        this.logger.error(`Error in GET batch tRPC call ${procedures}:`, error);
+        throw new HttpException(
+          {
+            error: error.message || 'Batch request failed',
+            procedures: procedures.split(','),
+            timestamp: new Date().toISOString()
+          },
+          error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+    }
+    
+    // Если это не batch запрос, обрабатываем как обычный GET запрос
+    return this.handleGetProcedure(procedures, inputParam);
+  }
+
+  /**
+   * Обработка GET запросов для query операций (приватный метод)
+   * Теперь вызывается из handleGetBatchProcedures для одиночных запросов
+   */
+  private async handleGetProcedure(procedure: string, inputParam?: string) {
     this.logger.debug(`GET tRPC call: ${procedure}`, { inputParam });
     
     try {
@@ -158,11 +242,12 @@ export class TrpcHttpController {
     
     return {
       message: 'tRPC HTTP Endpoint',
-      version: '1.0.0',
+      version: '1.1.0',
       endpoints: {
         single: 'POST /trpc/:procedure - для одиночных операций',
         get: 'GET /trpc/:procedure?input=encodedJSON - для query операций',
-        batch: 'POST /trpc - для batch операций'
+        getBatch: 'GET /trpc/:procedures?batch=1&input=batchInputJSON - для GET batch операций',
+        batch: 'POST /trpc - для POST batch операций'
       },
       registeredControllers,
       availableProcedures,
@@ -171,11 +256,17 @@ export class TrpcHttpController {
         introspection: routerInfo,
         proceduresByRouter: this.groupProceduresByRouter(availableProcedures)
       },
-      batchExample: {
-        url: 'POST /trpc',
-        body: {
-          "0": { "procedure": "users.getAll", "input": {} },
-          "1": { "procedure": "posts.getAll", "input": {} }
+      batchExamples: {
+        postBatch: {
+          url: 'POST /trpc',
+          body: {
+            "0": { "procedure": "users.getAll", "input": {} },
+            "1": { "procedure": "posts.getAll", "input": {} }
+          }
+        },
+        getBatch: {
+          url: 'GET /trpc/users.getAll,posts.getAll?batch=1&input={"0":{"json":{"id":1}},"1":{"json":{"id":2}}}',
+          description: 'GET batch запрос'
         }
       }
     };
