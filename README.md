@@ -1,63 +1,63 @@
 # tRPC NestJS Decorators
 
-🚀 Расширение функционала NestJS для создания tRPC роутеров с помощью декораторов с поддержкой **tRPC v11**.
+🚀 NestJS functionality extension for creating tRPC routers using decorators with **tRPC v11** support.
 
-## Описание проекта
+## Project Description
 
-Этот проект содержит npm пакет `trpc-nest-decorators`, который позволяет легко интегрировать tRPC v11 в NestJS приложения используя декораторы. Пакет предоставляет простой способ преобразования обычных NestJS контроллеров в tRPC роутеры с автоматической генерацией главного роутера и поддержкой всех новых возможностей tRPC v11.
+This project contains the `trpc-nest-decorators` npm package, which allows easy integration of tRPC v11 into NestJS applications using decorators. The package provides a simple way to convert regular NestJS controllers into tRPC routers with automatic main router generation and support for all new tRPC v11 features.
 
-## Структура проекта
+## Project Structure
 
 ```
 trpc-nest-decorators/
 ├── packages/
-│   └── trpc-nest-decorators/    # Основной npm пакет
+│   └── trpc-nest-decorators/    # Main npm package
 │       ├── src/
-│       │   ├── decorators.ts     # Декораторы (@Router, @Query, @Mutation)
-│       │   ├── types.ts          # TypeScript типы и интерфейсы
-│       │   ├── trpc-router.service.ts  # Сервис для генерации tRPC роутеров
-│       │   ├── auto-router.service.ts  # Автоматический роутер
-│       │   ├── trpc-nest.module.ts     # NestJS модуль
-│       │   ├── main-router.ts    # Утилитные функции
-│       │   └── index.ts          # Экспорт публичного API
+│       │   ├── decorators.ts     # Decorators (@Router, @Query, @Mutation)
+│       │   ├── types.ts          # TypeScript types and interfaces
+│       │   ├── trpc-router.service.ts  # Service for generating tRPC routers
+│       │   ├── auto-router.service.ts  # Automatic router
+│       │   ├── trpc-nest.module.ts     # NestJS module
+│       │   ├── main-router.ts    # Utility functions
+│       │   └── index.ts          # Public API exports
 │       ├── package.json
 │       ├── tsconfig.json
 │       └── README.md
-└── example/                     # Тестовое NestJS приложение
+└── example/                     # Test NestJS application
     ├── src/
-    │   ├── users/               # Пример контроллера пользователей
-    │   ├── posts/               # Пример контроллера постов
-    │   ├── app.controller.ts    # Демо endpoints
-    │   ├── app.service.ts       # Сервис с автоматическим роутером
-    │   ├── app.module.ts        # Главный модуль
-    │   └── main.ts              # Точка входа
+    │   ├── users/               # Users controller example
+    │   ├── posts/               # Posts controller example
+    │   ├── app.controller.ts    # Demo endpoints
+    │   ├── app.service.ts       # Service with automatic router
+    │   ├── app.module.ts        # Main module
+    │   └── main.ts              # Entry point
     ├── package.json
     └── README.md
 ```
 
-## Возможности пакета
+## Package Features
 
-### ✨ Основные функции
+### ✨ Core Functions
 
-- **Короткие декораторы**: `@Router`, `@Query`, `@Mutation`, `@Subscription`
-- **Автоматическая генерация роутеров**: преобразование NestJS контроллеров в tRPC роутеры
-- **Автоматический главный роутер**: объединение всех контроллеров в один роутер
-- **Валидация данных**: интеграция с Zod для входных и выходных данных
-- **Dependency Injection**: полная поддержка DI системы NestJS
-- **TypeScript поддержка**: полная типизация для безопасности типов
-- **Обратная совместимость**: старые декораторы с префиксом `Trpc` все еще работают
+- **Short decorators**: `@Router`, `@Query`, `@Mutation`, `@Subscription`
+- **Automatic router generation**: converting NestJS controllers to tRPC routers
+- **Automatic main router**: combining all controllers into one router
+- **Data validation**: Zod integration for input and output data
+- **Dependency Injection**: full support for NestJS DI system
+- **TypeScript support**: full typing for type safety
+- **Backward compatibility**: old decorators with `Trpc` prefix still work
 
-### 🎯 Преимущества
+### 🎯 Advantages
 
-- **Простота использования**: знакомый синтаксис декораторов NestJS
-- **Минимальная настройка**: легко подключается к существующим проектам
-- **Автоматизация**: не нужно вручную создавать и объединять роутеры
-- **Гибкость**: сохраняет все возможности NestJS и tRPC
-- **Производительность**: эффективная генерация роутеров
+- **Ease of use**: familiar NestJS decorator syntax
+- **Minimal setup**: easily integrates with existing projects
+- **Automation**: no need to manually create and combine routers
+- **Flexibility**: preserves all NestJS and tRPC capabilities
+- **Performance**: efficient router generation
 
-## Быстрый старт
+## Quick Start
 
-### 1. Сборка пакета
+### 1. Build Package
 
 ```bash
 cd packages/trpc-nest-decorators
@@ -65,7 +65,7 @@ npm install
 npm run build
 ```
 
-### 2. Запуск примера
+### 2. Run Example
 
 ```bash
 cd example
@@ -74,20 +74,20 @@ npm run build
 npm start
 ```
 
-### 3. Тестирование
+### 3. Testing
 
-Откройте браузер и переходите по адресам:
-- http://localhost:3000/api - информация о приложении
+Open your browser and navigate to:
+- http://localhost:3000/api - application information
 
-## Использование в вашем проекте
+## Usage in Your Project
 
-### Установка
+### Installation
 
 ```bash
 npm install trpc-nest-decorators @trpc/server zod
 ```
 
-### Создание контроллера
+### Creating a Controller
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -111,7 +111,7 @@ export class UsersController {
 }
 ```
 
-### Подключение модуля
+### Module Integration
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -119,12 +119,12 @@ import { TrpcNestModule } from 'trpc-nest-decorators';
 
 @Module({
   imports: [TrpcNestModule.forRoot()],
-  // ... остальные настройки
+  // ... other settings
 })
 export class AppModule {}
 ```
 
-### Автоматический роутер
+### Automatic Router
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -136,100 +136,100 @@ export class AppService {
     private readonly autoRouterService: AutoRouterService,
     private readonly usersController: UsersController
   ) {
-    // Регистрируем контроллер
+    // Register controller
     this.autoRouterService.registerController(UsersController, this.usersController);
   }
 
   getTrpcRouter() {
-    // Получаем автоматически созданный роутер
+    // Get automatically created router
     return createMainRouter();
   }
 }
 ```
 
-## Доступные декораторы
+## Available Decorators
 
 ### `@Router(options?)`
-Помечает класс как tRPC роутер
-- `options.prefix` - префикс для всех процедур
+Marks a class as a tRPC router
+- `options.prefix` - prefix for all procedures
 
 ### `@Query(path?, options?)`
-Создает tRPC query процедуру
-- `path` - путь процедуры (опционально)
-- `options.input` - схема валидации входных данных
-- `options.output` - схема валидации выходных данных
+Creates a tRPC query procedure
+- `path` - procedure path (optional)
+- `options.input` - input data validation schema
+- `options.output` - output data validation schema
 
 ### `@Mutation(path?, options?)`
-Создает tRPC mutation процедуру
+Creates a tRPC mutation procedure
 
 ### `@Subscription(path?, options?)`
-Создает tRPC subscription процедуру
+Creates a tRPC subscription procedure
 
-## Утилитные функции
+## Utility Functions
 
 ### `createMainRouter()`
-Возвращает автоматически созданный главный tRPC роутер
+Returns automatically created main tRPC router
 
 ### `getRegisteredControllers()`
-Возвращает информацию о зарегистрированных контроллерах
+Returns information about registered controllers
 
-## Примеры
+## Examples
 
-В папке `example/` вы найдете полный рабочий пример с:
-- Контроллерами пользователей и постов
-- Валидацией данных через Zod
-- Различными типами tRPC процедур
-- Автоматической генерацией главного роутера
-- Полной интеграцией с NestJS DI
+In the `example/` folder you'll find a complete working example with:
+- Users and posts controllers
+- Data validation through Zod
+- Different types of tRPC procedures
+- Automatic main router generation
+- Full integration with NestJS DI
 
-## Обратная совместимость
+## Backward Compatibility
 
-Старые декораторы с префиксом `Trpc` все еще поддерживаются:
+Old decorators with `Trpc` prefix are still supported:
 
 ```typescript
-// Старый синтаксис (все еще работает)
+// Old syntax (still works)
 import { TrpcRouter, TrpcQuery, TrpcMutation } from 'trpc-nest-decorators';
 
-// Новый синтаксис (рекомендуется)
+// New syntax (recommended)
 import { Router, Query, Mutation } from 'trpc-nest-decorators';
 ```
 
-## Планы развития
+## Development Plans
 
-- [x] Короткие декораторы без префикса
-- [x] Автоматический главный роутер
-- [x] **tRPC v11 поддержка**
+- [x] Short decorators without prefix
+- [x] Automatic main router
+- [x] **tRPC v11 support**
 - [x] **FormData / Non-JSON Content Types**
 - [x] **Streaming Responses**
 - [x] **Server-Sent Events Subscriptions**
-- [x] **Улучшенные subscriptions с generators**
+- [x] **Enhanced subscriptions with generators**
 - [x] **Shorthand Router Definitions**
-- [ ] HTTP adapter интеграция
-- [ ] Middleware поддержка
-- [ ] Аутентификация и авторизация
-- [ ] Расширенная типизация
-- [ ] Документация API
-- [ ] Тесты
-- [ ] **TanStack Query v5 интеграция**
-- [ ] **React Server Components поддержка**
+- [ ] HTTP adapter integration
+- [ ] Middleware support
+- [ ] Authentication and authorization
+- [ ] Extended typing
+- [ ] API documentation
+- [ ] Tests
+- [ ] **TanStack Query v5 integration**
+- [ ] **React Server Components support**
 
-## Лицензия
+## License
 
 MIT
 
-## Вклад в проект
+## Contributing
 
-Мы рады вашему участию! Создавайте issues и pull requests.
+We welcome your participation! Create issues and pull requests.
 
 ---
 
-**Примечание**: Этот пакет находится в стадии разработки. Для production использования рекомендуется дополнительное тестирование и настройка.
+**Note**: This package is in development stage. For production use, additional testing and configuration is recommended.
 
-## 🆕 Новые возможности tRPC v11
+## 🆕 New tRPC v11 Features
 
 ### FormData / Non-JSON Content Types Support
 
-Поддержка различных типов контента, включая `FormData`, `Blob`, `File`, `Uint8Array`, и `ReadableStream`:
+Support for various content types, including `FormData`, `Blob`, `File`, `Uint8Array`, and `ReadableStream`:
 
 ```typescript
 import { FormDataMutation, BinaryMutation, formDataParser, octetInputParser } from 'trpc-nest-decorators';
@@ -268,7 +268,7 @@ export class UploadController {
 
 ### Streaming Responses
 
-Поддержка стриминга ответов для работы с большими объемами данных:
+Support for streaming responses to work with large amounts of data:
 
 ```typescript
 import { StreamingQuery, createStreamingResponse } from 'trpc-nest-decorators';
@@ -278,7 +278,7 @@ export class StreamingController {
   
   @StreamingQuery('stream-data')
   async streamData() {
-    // Async generator для стриминга
+    // Async generator for streaming
     return (async function* () {
       for (let i = 0; i < 100; i++) {
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -289,7 +289,7 @@ export class StreamingController {
 
   @StreamingQuery('stream-users')
   async streamUsers() {
-    const users = await this.getAllUsers(); // Получить всех пользователей
+    const users = await this.getAllUsers(); // Get all users
     return createStreamingResponse(users, {
       batchSize: 10,
       delayMs: 500
@@ -300,7 +300,7 @@ export class StreamingController {
 
 ### Server-Sent Events Subscriptions
 
-Улучшенные подписки с поддержкой Server-Sent Events:
+Enhanced subscriptions with Server-Sent Events support:
 
 ```typescript
 import { SSESubscription } from 'trpc-nest-decorators';
@@ -327,7 +327,7 @@ export class RealtimeController {
     input: z.object({ userId: z.string() })
   })
   async userNotifications(input: { userId: string }) {
-    // Генерировать уведомления для пользователя
+    // Generate notifications for user
     return this.generateNotifications(input.userId);
   }
 }
@@ -335,18 +335,18 @@ export class RealtimeController {
 
 ### Shorthand Router Definitions
 
-Упрощенное определение роутеров:
+Simplified router definitions:
 
 ```typescript
-// Теперь можно использовать простые объекты для создания под-роутеров
+// Now you can use simple objects to create sub-routers
 const appRouter = router({
-  // Shorthand - простой объект создает под-роутер
+  // Shorthand - simple object creates sub-router
   users: {
     getAll: publicProcedure.query(() => getAllUsers()),
     create: publicProcedure.input(z.object({ name: z.string() })).mutation(({ input }) => createUser(input))
   },
   
-  // Эквивалентно:
+  // Equivalent to:
   posts: router({
     getAll: publicProcedure.query(() => getAllPosts()),
     create: publicProcedure.input(z.object({ title: z.string() })).mutation(({ input }) => createPost(input))
@@ -354,16 +354,16 @@ const appRouter = router({
 });
 ```
 
-### Новые декораторы tRPC v11
+### New tRPC v11 Decorators
 
 ```typescript
-// Специализированные декораторы для tRPC v11
-@FormDataMutation() // Для FormData
-@BinaryMutation()   // Для бинарных данных
-@StreamingQuery()   // Для стриминга
-@SSESubscription()  // Для Server-Sent Events
+// Specialized decorators for tRPC v11
+@FormDataMutation() // For FormData
+@BinaryMutation()   // For binary data
+@StreamingQuery()   // For streaming
+@SSESubscription()  // For Server-Sent Events
 
-// Новые утилиты
+// New utilities
 import {
   formDataParser,
   blobParser,
@@ -376,14 +376,14 @@ import {
 } from 'trpc-nest-decorators';
 ```
 
-### Пример использования всех возможностей
+### Example Using All Features
 
 ```typescript
 @Router({ prefix: 'v11-demo' })
 @Injectable()
 export class TrpcV11DemoController {
   
-  // FormData с валидацией
+  // FormData with validation
   @FormDataMutation('upload-profile', {
     input: createFormDataSchema({
       name: z.string().min(1),
@@ -399,7 +399,7 @@ export class TrpcV11DemoController {
     return { name, email, avatarSize: avatar.size };
   }
 
-  // Стриминг больших данных
+  // Streaming large data
   @StreamingQuery('export-data', {
     input: z.object({ format: z.enum(['json', 'csv']) })
   })
@@ -408,7 +408,7 @@ export class TrpcV11DemoController {
     return createStreamingResponse(data, { batchSize: 100 });
   }
 
-  // Живые уведомления
+  // Live notifications
   @SSESubscription('live-chat', {
     input: z.object({ roomId: z.string() })
   })
@@ -416,7 +416,7 @@ export class TrpcV11DemoController {
     return this.generateChatMessages(input.roomId);
   }
 
-  // Обработка бинарных данных
+  // Binary data processing
   @BinaryMutation('process-file')
   async processFile(stream: ReadableStream) {
     const chunks = [];
@@ -440,22 +440,22 @@ export class TrpcV11DemoController {
 }
 ```
 
-## Миграция на tRPC v11
+## Migration to tRPC v11
 
-Для обновления существующего проекта до tRPC v11:
+To update an existing project to tRPC v11:
 
-1. **Обновите зависимости:**
+1. **Update dependencies:**
 ```bash
 npm install @trpc/server@^11.0.0 trpc-nest-decorators@^2.0.0
 ```
 
-2. **Используйте новые возможности:**
+2. **Use new features:**
 ```typescript
-// Старый код остается совместимым
+// Old code remains compatible
 @Query('users')
 async getUsers() { /* ... */ }
 
-// Новые возможности v11
+// New v11 features
 @StreamingQuery('users-stream')
 async getUsersStream() { 
   return createStreamingResponse(await this.getUsers(), { batchSize: 10 });
@@ -465,9 +465,9 @@ async getUsersStream() {
 async upload(formData: FormData) { /* ... */ }
 ```
 
-3. **Обновите импорты:**
+3. **Update imports:**
 ```typescript
-// Добавьте новые импорты для v11 функций
+// Add new imports for v11 functions
 import { 
   FormDataMutation, 
   StreamingQuery, 
@@ -477,9 +477,9 @@ import {
 } from 'trpc-nest-decorators';
 ```
 
-## Документация по tRPC v11
+## tRPC v11 Documentation
 
-Для получения дополнительной информации о tRPC v11, посетите:
-- [Анонс tRPC v11](https://trpc.io/blog/announcing-trpc-v11)
-- [Официальная документация tRPC](https://trpc.io/docs)
-- [Руководство по миграции на v11](https://trpc.io/docs/migrate-from-v10-to-v11) 
+For additional information about tRPC v11, visit:
+- [tRPC v11 Announcement](https://trpc.io/blog/announcing-trpc-v11)
+- [Official tRPC Documentation](https://trpc.io/docs)
+- [Migration Guide to v11](https://trpc.io/docs/migrate-from-v10-to-v11) 
