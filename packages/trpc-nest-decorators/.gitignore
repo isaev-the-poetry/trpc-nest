@@ -1,0 +1,31 @@
+# NPM Package specific ignores
+
+# Build outputs
+dist/
+lib/
+build/
+*.tsbuildinfo
+
+# Dependencies
+node_modules/
+
+# NPM package files
+*.tgz
+npm-debug.log*
+
+# Test coverage
+coverage/
+*.lcov
+.nyc_output
+
+# Temporary files
+.tmp/
+temp/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db 
