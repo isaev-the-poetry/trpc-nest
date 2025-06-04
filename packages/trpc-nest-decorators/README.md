@@ -76,17 +76,85 @@ export class UsersController {
 ```
 
 ### 3. Register the controller in a module
-
+  
+**Backend (app.service.ts) - Multiple ways to get the router:** 
+**Method 1: Using createMainRouter (as before):**
 ```typescript
-// users.module.ts
-import { Module } from '@nestjs/common';
-import { UsersController } from './users.controller';
+import { Injectable } from '@nestjs/common';
+import { createMainRouter } from 'trpc-nest-decorators';
 
-@Module({
-  providers: [UsersController],
-})
-export class UsersModule {}
+@Injectable()
+export class AppService {
+  getTrpcRouter() {
+    // Get automatically created router with auto discovery
+    // All controllers with @Router decorator will be included automatically
+    return createMainRouter();
+  }
+}
+
+// Export router type for frontend
+export type AppRouter = ReturnType<typeof AppService.prototype.getTrpcRouter>;
 ```
+
+**Method 2: Using TrpcRouterProvider (recommended):**
+```typescript
+import { Injectable } from '@nestjs/common';
+import { InjectTrpcRouter, TrpcRouterProvider, AppRouter } from 'trpc-nest-decorators';
+
+@Injectable()
+export class AppService {
+  constructor(@InjectTrpcRouter() private trpcRouter: TrpcRouterProvider) {}
+  
+  @AppRouter()
+  getTrpcRouter() {} // decorator will handle method automaticly
+  
+  // OR implement explicit way  
+  // getTrpcRouter() {
+  //  return this.trpcRouter.getMainRouter();
+  // } 
+}
+
+// Export router type for frontend
+export type AppRouter = ReturnType<typeof AppService.prototype.getTrpcRouter>;
+```
+
+### 4 Frontend Integration 
+**Frontend (React/Next.js):**
+```typescript
+import { createTRPCReact } from '@trpc/react-query';
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
+import type { AppRouter } from '../backend/src/app.service';
+
+// For React with React Query
+export const trpc = createTRPCReact<AppRouter>();
+
+// For vanilla usage
+export const trpcClient = createTRPCProxyClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: 'http://localhost:3000/trpc',
+    }),
+  ],
+});
+
+// Usage in React component
+function UsersComponent() {
+  const { data: users } = trpc.users.getAll.useQuery();
+  const createUser = trpc.users.create.useMutation();
+
+  const handleCreate = () => {
+    createUser.mutate({ name: 'New User' });
+  };
+
+  return (
+    <div>
+      {users?.map(user => <div key={user.id}>{user.name}</div>)}
+      <button onClick={handleCreate}>Create User</button>
+    </div>
+  );
+}
+```
+
 
 ## Auto-Discovery
 
@@ -288,163 +356,3 @@ If you're upgrading from a version without auto-discovery:
 ## License
 
 MIT
-
-## 🎯 Интеграция с tRPC клиентом
-
-Автоматические endpoints полностью совместимы с официальным tRPC клиентом:
-
-```typescript
-// client.ts
-import { createTRPCClient, httpBatchLink } from '@trpc/client';
-
-const client = createTRPCClient({
-  links: [
-    httpBatchLink({
-      url: 'http://localhost:3000/trpc',
-    }),
-  ],
-});
-
-// Использование
-const users = await client.users.getAll.query();
-const user = await client.users.getById.query({ id: 1 });
-const newUser = await client.users.create.mutate({
-  name: 'Charlie',
-  email: 'charlie@example.com',
-  age: 28
-});
-```
-
-## 🔧 Декораторы
-
-### @Router
-Помечает класс как tRPC роутер:
-
-```typescript
-@Router({ prefix: 'users' })
-@Injectable()
-export class UsersController {}
-```
-
-### @Query
-Помечает метод как query операцию:
-
-```typescript
-@Query('getAll')
-async getAllUsers() {}
-
-@Query('getById', {
-  input: z.object({ id: z.number() })
-})
-async getUserById(input: { id: number }) {}
-```
-
-### @Mutation
-Помечает метод как mutation операцию:
-
-```typescript
-@Mutation('create', {
-  input: CreateUserSchema
-})
-async createUser(input: CreateUserInput) {}
-```
-
-### @Subscription
-Помечает метод как subscription операцию:
-
-```typescript
-@Subscription('userUpdates')
-async userUpdates() {}
-```
-
-## ⚙️ Конфигурация
-
-### Опции модуля
-
-```typescript
-TrpcNestModule.forRoot({
-  enableHttpEndpoints: true,  // Включить автоматические HTTP endpoints (по умолчанию: true)
-  httpPrefix: 'api',          // Префикс для HTTP endpoints (будущая функция)
-})
-```
-
-### Отключение HTTP endpoints
-
-```typescript
-TrpcNestModule.forRoot({
-  enableHttpEndpoints: false  // Отключает автоматические endpoints
-})
-```
-
-## 🔄 Обратная совместимость
-
-Пакет поддерживает старые имена декораторов:
-
-```typescript
-// Новые (рекомендуемые)
-@Router()
-@Query()
-@Mutation()
-@Subscription()
-
-// Старые (поддерживаются)
-@TrpcRouter()
-@TrpcQuery()
-@TrpcMutation()
-@TrpcSubscription()
-```
-
-## 📊 Производительность
-
-- **Batch запросы**: Выполняются параллельно для максимальной производительности
-- **Минимальные накладные расходы**: Прямые вызовы методов контроллеров
-- **Кэширование роутеров**: Роутеры создаются один раз при регистрации
-
-## 🛡️ Обработка ошибок
-
-Автоматическая обработка ошибок с подробными сообщениями:
-
-```json
-{
-  "error": "Procedure 'getById' not found in controller 'users'",
-  "procedure": "users.getById",
-  "timestamp": "2025-06-04T17:15:13.839Z"
-}
-```
-
-Batch запросы обрабатывают ошибки индивидуально:
-
-```json
-{
-  "0": { "result": [...] },
-  "1": { "error": { "message": "User not found", "code": "NOT_FOUND" } }
-}
-```
-
-## 📚 Примеры
-
-Полные примеры доступны в папке `example/`:
-
-- Базовая настройка
-- Контроллеры с валидацией
-- Демо скрипты для тестирования
-- Интеграция с фронтендом
-
-## 🤝 Совместимость
-
-- **NestJS**: 8.x, 9.x, 10.x
-- **tRPC**: 10.x, 11.x
-- **TypeScript**: 4.5+
-- **Node.js**: 16+
-
-## 📝 Лицензия
-
-MIT
-
-## 🚀 Roadmap
-
-- [ ] WebSocket поддержка для subscriptions
-- [ ] Middleware для аутентификации
-- [ ] Автоматическая генерация OpenAPI схем
-- [ ] Интеграция с NestJS Guards и Interceptors
-- [ ] Поддержка custom transformers 
